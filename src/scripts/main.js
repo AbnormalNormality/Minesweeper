@@ -261,7 +261,7 @@ const minesInput = document.getElementById("mines");
 const startButton = document.getElementById("start");
 
 function generateGrid() {
-  ms.initiateGrid(rowsInput.value, colsInput.value, minesInput.value / 100);
+  ms.initiateGrid(colsInput.value, rowsInput.value, minesInput.value / 100);
 }
 
 function limitNumberInput(input) {
