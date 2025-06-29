@@ -63,6 +63,7 @@ class Minesweeper {
           nearbyMines: 0,
           nearbyFlagged: 0,
           nearbyRevealedMines: 0,
+          show: false,
         };
 
         const tileDiv = document.createElement("div");
@@ -139,11 +140,12 @@ class Minesweeper {
     if (tile.flagged) {
       tile.div.style.setProperty("--colour", "var(--tile-flag)");
       tile.text.textContent = "⚑";
-    } else if (!tile.revealed) {
+    } else if (!tile.revealed && !tile.show) {
       tile.div.style.setProperty("--colour", "var(--tile-unknown)");
       tile.text.textContent = "?";
     } else if (tile.mine) {
-      tile.div.style.setProperty("--colour", "var(--tile-mine)");
+      const colour = tile.show ? "var(--tile-show)" : "var(--tile-mine)";
+      tile.div.style.setProperty("--colour", colour);
       tile.text.textContent = "X";
     } else {
       tile.div.style.setProperty("--colour", "var(--tile-safe)");
@@ -257,7 +259,15 @@ class Minesweeper {
       this.gridDiv.addEventListener("contextmenu", this.endGameBlocker, true);
       this.gridDiv.classList.add("gameover");
       if (win) this.gridDiv.classList.add("win");
-      else this.gridDiv.classList.add("lose");
+      else {
+        this.gridDiv.classList.add("lose");
+        for (const mine of this.mines) {
+          const tile = this.grid[mine[0]][mine[1]];
+          if (tile.revealed || tile.marked) continue;
+          tile.show = true;
+          this.updateTileDiv(tile);
+        }
+      }
     }
   }
 
@@ -283,7 +293,7 @@ function updateTimer() {
   if (!start) {
     elapsedTime = 0;
   } else {
-    end = ms.timerEnd || Date.now();
+    const end = ms.timerEnd || Date.now();
     elapsedTime = end - start;
   }
 
@@ -348,7 +358,7 @@ const inputToggleLabel = document.getElementById("inputToggleLabel");
 const inputToggleCheckbox = document.getElementById("inputToggle");
 const inputToggleDiv = document.getElementById("inputToggleText");
 
-let timerLoop = setInterval(updateTimer, 10);
+let timerLoop = setInterval(updateTimer, 39);
 
 limitNumberInput(rowsInput);
 limitNumberInput(colsInput);
@@ -368,5 +378,3 @@ bindInput(inputToggleCheckbox, toggleInput);
 
 startButton.onclick = generateGrid;
 generateGrid();
-
-ts.currentTheme = "auto";

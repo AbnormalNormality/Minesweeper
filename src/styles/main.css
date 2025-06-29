@@ -2,9 +2,7 @@
   --font-family: Verdana, Geneva, Tahoma, sans-serif;
   --transition-duration: 0.3s;
   --tile-transition: 0.15s;
-}
-
-:root, [ts-theme="light"] {
+  
   --background-colour: #eee;
   --text-colour: #000;
   --border: 1px solid #000;
@@ -15,9 +13,11 @@
   --tile-safe: #afa;
   --tile-mine: #faa;
   --tile-flag: #ffa;
+  --tile-show: #fad;
 }
 
-[ts-theme="dark"] {
+@media (prefers-color-scheme: dark) {
+  :root {
   --background-colour: #444;
   --text-colour: #fff;
   --border: 1px solid #fff;
@@ -28,6 +28,8 @@
   --tile-safe: #0b0;
   --tile-mine: #b00;
   --tile-flag: #bb0;
+  --tile-show: #b09;
+  }
 }
 
 * {
@@ -172,10 +174,6 @@ div {
   left: 0.75vmin;
 }
 
-#theme-selector {
-  display: none;
-}
-
 #inputToggleLabel {
   --colour: var(--tile-mine);
 
@@ -187,7 +185,7 @@ div {
   border: var(--border);
   border-radius: 5px;
   background-color: var(--colour);
-  transition: background-color 0.15s ease;
+  transition: background-color var(--tile-transition) ease;
   display: flex;
   justify-content: center;
   align-items: center;
