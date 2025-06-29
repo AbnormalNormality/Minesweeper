@@ -6,7 +6,7 @@
   --background-colour: #eee;
   --text-colour: #000;
   --border: 1px solid #000;
-  --input-colour: #fff;
+  --input-colour: #eee;
   --accent-colour: #59f;
 
   --tile-unknown: #fff;
@@ -157,7 +157,7 @@ div, input, button {
 
 #options {
   bottom: calc(var(--gap) * 2);
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
 }
 
 #timer {
@@ -170,4 +170,11 @@ input, button {
   background-color: var(--input-colour);
   border: var(--border);
   accent-color: var(--accent-colour);
+  border-radius: 5px;
+}
+
+input[type="number"] {
+  border: none;
+  border-bottom: var(--border);
+  border-radius: 5px 5px 0 0;
 }

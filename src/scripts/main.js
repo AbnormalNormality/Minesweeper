@@ -9,6 +9,7 @@ class Minesweeper {
   revealedSafe = 0;
   revealedMines = 0;
   quickReveal = true;
+  quickWin = true;
 
   timerStart;
   gridDiv;
@@ -241,7 +242,7 @@ class Minesweeper {
   checkWin() {
     const markedRevealedMines = this.markedMines + this.revealedMines;
     const win =
-      markedRevealedMines === this.mines.length ||
+      (markedRevealedMines === this.mines.length && this.quickWin) ||
       markedRevealedMines === this.totalTiles - this.revealedSafe - 1;
     const lose = this.revealedMines > 0;
 
@@ -313,12 +314,10 @@ function storeInputState(input) {
   input.addEventListener("input", () => localStorage.setItem(key, get()));
 }
 
-function toggleTimer() {
-  timerDiv.style.display = timerCheckbox.checked ? "flex" : "none";
-}
-
-function toggleQuickReveal() {
-  ms.quickReveal = quickRevealCheckbox.checked;
+function bindInput(input, callback) {
+  const get = () => (input.type === "checkbox" ? input.checked : input.value);
+  input.addEventListener("input", () => callback(get()));
+  callback(get());
 }
 
 const ms = new Minesweeper(document.getElementById("grid"));
@@ -330,6 +329,7 @@ const startButton = document.getElementById("start");
 const timerDiv = document.getElementById("timer");
 const timerCheckbox = document.getElementById("timerToggle");
 const quickRevealCheckbox = document.getElementById("quickRevealToggle");
+const quickWinCheckbox = document.getElementById("quickWinToggle");
 
 let timerLoop = setInterval(updateTimer, 10);
 
@@ -338,12 +338,19 @@ limitNumberInput(colsInput);
 limitNumberInput(minesInput);
 storeInputState(timerCheckbox);
 storeInputState(quickRevealCheckbox);
+storeInputState(quickWinCheckbox);
 
-timerCheckbox.addEventListener("input", toggleTimer);
-toggleTimer();
+bindInput(timerCheckbox, (checked) => {
+  timerDiv.style.display = checked ? "flex" : "none";
+});
 
-quickRevealCheckbox.addEventListener("input", toggleQuickReveal);
-toggleQuickReveal();
+bindInput(quickRevealCheckbox, (checked) => {
+  ms.quickReveal = checked;
+});
+
+bindInput(quickWinCheckbox, (checked) => {
+  ms.quickWin = checked;
+});
 
 startButton.onclick = generateGrid;
 generateGrid();
