@@ -303,7 +303,9 @@ function storeInputState(input) {
   const key = `rememberInput-${input.id}`;
   const get = () => (input.type === "checkbox" ? input.checked : input.value);
   const set = (v) => {
-    if (input.type === "checkbox") input.checked = v === "true";
+    if (input.type === "checkbox") input.checked = v;
+    else if (input.type === "number")
+      input.value = Math.min(Math.max(v, input.min), input.max);
     else input.value = v;
   };
 
