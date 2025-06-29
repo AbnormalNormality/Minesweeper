@@ -10,6 +10,7 @@ class Minesweeper {
   revealedMines = 0;
   quickReveal = true;
   quickWin = true;
+  reverseInput = false;
 
   timerStart;
   gridDiv;
@@ -34,6 +35,7 @@ class Minesweeper {
     this.revealedMines = 0;
     this.timerStart = null;
     this.timerEnd = null;
+    this.markedSafe = 0;
 
     this.gridDiv.removeEventListener("click", this.endGameBlocker, true);
     this.gridDiv.removeEventListener("contextmenu", this.endGameBlocker, true);
@@ -91,6 +93,7 @@ class Minesweeper {
   }
 
   guessTile(row, col, flag = false) {
+    if (this.reverseInput) flag = !flag;
     const tile = this.grid[row][col];
 
     if (this.start) {
@@ -110,13 +113,13 @@ class Minesweeper {
       tile.flagged = !tile.flagged;
       this.updateTileDiv(tile);
 
+      if (tile.mine) this.markedMines += !wasFlagged ? 1 : -1;
+      else if (!tile.mine) this.markedSafe += !wasFlagged ? 1 : -1;
+
       for (const t of this.surroundingTiles(row, col)) {
         if (wasFlagged) t.nearbyFlagged--;
         else t.nearbyFlagged++;
       }
-
-      if (!wasFlagged && tile.mine) this.markedMines++;
-      else if (wasFlagged && tile.mine) this.markedMines--;
     } else {
       if (!tile.mine) {
         this.clearChunk(tile, true);
@@ -242,7 +245,9 @@ class Minesweeper {
   checkWin() {
     const markedRevealedMines = this.markedMines + this.revealedMines;
     const win =
-      (markedRevealedMines === this.mines.length && this.quickWin) ||
+      (markedRevealedMines === this.mines.length &&
+        this.quickWin &&
+        this.markedSafe == 0) ||
       markedRevealedMines === this.totalTiles - this.revealedSafe - 1;
     const lose = this.revealedMines > 0;
 
@@ -320,6 +325,15 @@ function bindInput(input, callback) {
   callback(get());
 }
 
+function toggleInput(checked) {
+  ms.reverseInput = checked;
+  inputToggleLabel.style.setProperty(
+    "--colour",
+    checked ? "var(--tile-flag)" : "var(--tile-mine)"
+  );
+  inputToggleDiv.textContent = checked ? "⚑" : "X";
+}
+
 const ms = new Minesweeper(document.getElementById("grid"));
 
 const rowsInput = document.getElementById("rows");
@@ -330,6 +344,9 @@ const timerDiv = document.getElementById("timer");
 const timerCheckbox = document.getElementById("timerToggle");
 const quickRevealCheckbox = document.getElementById("quickRevealToggle");
 const quickWinCheckbox = document.getElementById("quickWinToggle");
+const inputToggleLabel = document.getElementById("inputToggleLabel");
+const inputToggleCheckbox = document.getElementById("inputToggle");
+const inputToggleDiv = document.getElementById("inputToggleText");
 
 let timerLoop = setInterval(updateTimer, 10);
 
@@ -340,17 +357,16 @@ storeInputState(timerCheckbox);
 storeInputState(quickRevealCheckbox);
 storeInputState(quickWinCheckbox);
 
-bindInput(timerCheckbox, (checked) => {
-  timerDiv.style.display = checked ? "flex" : "none";
-});
+bindInput(
+  timerCheckbox,
+  (checked) => (timerDiv.style.display = checked ? "flex" : "none")
+);
 
-bindInput(quickRevealCheckbox, (checked) => {
-  ms.quickReveal = checked;
-});
-
-bindInput(quickWinCheckbox, (checked) => {
-  ms.quickWin = checked;
-});
+bindInput(quickRevealCheckbox, (checked) => (ms.quickReveal = checked));
+bindInput(quickWinCheckbox, (checked) => (ms.quickWin = checked));
+bindInput(inputToggleCheckbox, toggleInput);
 
 startButton.onclick = generateGrid;
 generateGrid();
+
+ts.currentTheme = "auto";

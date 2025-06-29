@@ -54,6 +54,10 @@ div, input, button {
   font-size: 1rem;
 }
 
+div {
+  display: flex;
+}
+
 #grid {
   --max-width: 90vw;
   --max-height: 90vh;
@@ -81,7 +85,6 @@ div, input, button {
   border-top: var(--border);
   border-left: var(--border);
   background-color: var(--colour);
-  display: flex;
   justify-content: center;
   align-items: center;
   transition: background-color var(--tile-transition) ease,
@@ -99,7 +102,6 @@ div, input, button {
   inset: 0;
   background-color: #0003;
   z-index: 10;
-  display: flex;
   transition: opacity var(--transition-duration) ease;
   pointer-events: none;
 }
@@ -144,9 +146,8 @@ div, input, button {
   }
 
   > div {
-    gap: 2.5px;
+    gap: var(--gap);
     align-items: center;
-    display: flex;
     justify-content: center;
   }
 }
@@ -167,8 +168,37 @@ div, input, button {
 
 #timer {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 0.75vmin;
+  left: 0.75vmin;
+}
+
+#theme-selector {
+  display: none;
+}
+
+#inputToggleLabel {
+  --colour: var(--tile-mine);
+
+  position: absolute;
+  top: 0.75vmin;
+  right: 0.75vmin;
+  width: 4vmax;
+  height: 4vmax;
+  border: var(--border);
+  border-radius: 5px;
+  background-color: var(--colour);
+  transition: background-color 0.15s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#inputToggle {
+  display: none;
+}
+
+#inputToggleText {
+  font-size: 1vmax;
 }
 
 input, button {
