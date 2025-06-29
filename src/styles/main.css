@@ -1,0 +1,136 @@
+:root {
+  --font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+:root, [ts-theme="light"] {
+  --background-colour: #eee;
+  --text-colour: #000;
+  --border: 1px solid #000;
+
+  --tile-unknown: #fff;
+  --tile-safe: #afa;
+  --tile-mine: #faa;
+  --tile-flag: #ffa;
+}
+
+[ts-theme="dark"] {
+  --background-colour: #444;
+  --text-colour: #fff;
+  --border: 1px solid #fff;
+
+  --tile-unknown: #888;
+  --tile-safe: #0b0;
+  --tile-mine: #b00;
+  --tile-flag: #bb0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 2vmin;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  height: 100%;
+  background-color: var(--background-colour);
+  display: flex;
+  padding: 15px;
+  transition: background-color 0.15s ease;
+}
+
+div {
+  font-family: var(--font-family);
+  color: var(--text-colour);
+}
+
+#grid {
+  --max-width: 90vw;
+  --max-height: 90vh;
+  --cols: 0;
+  --rows: 0;
+  --tile-size: min(var(--max-width) / var(--cols), var(--max-height) / var(--rows));
+
+  display: grid;
+  border: var(--border);
+  grid-template-columns: repeat(var(--cols), var(--tile-size));
+  grid-template-rows: repeat(var(--rows), var(--tile-size));
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  margin: auto;
+  z-index: 1;
+  position: relative;
+}
+
+#grid > .tile {
+  --colour: var(--tile-unknown);
+
+  width: var(--tile-size);
+  height: var(--tile-size);
+  border-top: var(--border);
+  border-left: var(--border);
+  background-color: var(--colour);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  font-size: calc(min(1rem, var(--tile-size) * 0.75));
+  user-select: none;
+}
+
+#grid > .tile[data-row="0"] { border-top: none; }
+#grid > .tile[data-col="0"] { border-left: none; }
+
+#grid > .filter {
+  opacity: 0;
+  position: absolute;
+  inset: 0;
+  background-color: #0003;
+  z-index: 10;
+  display: flex;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+#grid.gameover > .filter {
+  opacity: 1;
+}
+
+#grid.win > .filter {
+  background-color: #00ff0026;
+}
+
+#grid.lose > .filter {
+  background-color: #ff000026;
+}
+
+#controls {
+  background-color: var(--tile-unknown);
+  border: var(--border);
+  border-radius: 5px;
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 50vw;
+  display: grid;
+  padding: 2.5px;
+  gap: 5px;
+  align-items: center;
+  grid-template-columns: repeat(3, 1fr 2fr) 1fr;
+  opacity: 0.75;
+  transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+  z-index: 999;
+
+  > * {
+    width: 100%;
+  }
+}
+
+#controls:hover {
+  opacity: 1;
+}
