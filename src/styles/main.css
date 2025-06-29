@@ -108,33 +108,55 @@ div {
   background-color: #ff000026;
 }
 
-#controls {
+#controls, #options {
+  --gap: 1vmin;
+
   background-color: var(--tile-unknown);
   border: var(--border);
   border-radius: 5px;
   position: absolute;
-  top: 15px;
   left: 50%;
   transform: translateX(-50%);
-  max-width: 50vw;
   display: grid;
-  padding: 2.5px;
-  gap: 5px;
+  padding: calc(var(--gap) / 2);
+  gap: var(--gap);
   align-items: center;
-  grid-template-columns: repeat(3, 1fr 2fr) 1fr;
   opacity: 0.75;
   transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease;
   z-index: 999;
 
-  > * {
+  > *:not([type="checkbox"]) {
     width: 100%;
   }
 
   > label {
     text-align: center;
   }
+
+  > div {
+    gap: 2.5px;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+  }
 }
 
-#controls:hover {
+#controls:hover, #options:hover {
   opacity: 1;
+}
+
+#controls {
+  top: calc(var(--gap) * 2);
+  grid-template-columns: repeat(3, 1fr 2fr) 1fr;
+}
+
+#options {
+  bottom: calc(var(--gap) * 2);
+  grid-template-columns: repeat(2, 1fr);
+}
+
+#timer {
+  position: absolute;
+  top: 10px;
+  left: 10px;
 }

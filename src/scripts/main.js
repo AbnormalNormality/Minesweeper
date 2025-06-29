@@ -8,8 +8,11 @@ class Minesweeper {
   markedMines = 0;
   revealedSafe = 0;
   revealedMines = 0;
+  quickReveal = true;
 
+  timerStart;
   gridDiv;
+  timerEnd;
 
   endGameBlocker = (event) => {
     event.stopImmediatePropagation();
@@ -28,6 +31,8 @@ class Minesweeper {
     this.markedMines = 0;
     this.revealedSafe = 0;
     this.revealedMines = 0;
+    this.timerStart = null;
+    this.timerEnd = null;
 
     this.gridDiv.removeEventListener("click", this.endGameBlocker, true);
     this.gridDiv.removeEventListener("contextmenu", this.endGameBlocker, true);
@@ -94,6 +99,7 @@ class Minesweeper {
         this.rows * this.cols - 1
       );
       this.placeMines(mineCount, tile);
+      this.timerStart = Date.now();
     }
 
     if (tile.revealed) {
@@ -158,7 +164,7 @@ class Minesweeper {
     while (tilesToCheck.length > 0) {
       const tile = tilesToCheck.pop();
 
-      if (tile.revealed && !startTile.revealed) continue;
+      if (tile.revealed && (!startTile.revealed || !this.quickReveal)) continue;
       else if (!tile.revealed) {
         tile.revealed = true;
 
@@ -240,6 +246,7 @@ class Minesweeper {
     const lose = this.revealedMines > 0;
 
     if (win || lose) {
+      this.timerEnd = Date.now();
       this.gridDiv.addEventListener("click", this.endGameBlocker, true);
       this.gridDiv.addEventListener("contextmenu", this.endGameBlocker, true);
       this.gridDiv.classList.add("gameover");
@@ -253,30 +260,88 @@ class Minesweeper {
   }
 }
 
+function generateGrid() {
+  ms.initiateGrid(colsInput.value, rowsInput.value, minesInput.value / 100);
+}
+
+function limitNumberInput(input) {
+  storeInputState(input);
+  input.addEventListener("input", () => {
+    input.value = Math.min(Math.max(input.value, input.min), input.max);
+  });
+}
+
+function updateTimer() {
+  let start = ms.timerStart;
+  let elapsedTime;
+  if (!start) {
+    elapsedTime = 0;
+  } else {
+    end = ms.timerEnd || Date.now();
+    elapsedTime = end - start;
+  }
+
+  let milliseconds = elapsedTime % 1000;
+  let seconds = Math.floor((elapsedTime / 1000) % 60);
+  let minutes = Math.floor((elapsedTime / (1000 * 60)) % 60);
+  let hours = Math.floor((elapsedTime / (1000 * 60 * 60)) % 24);
+
+  hours = String(hours).padStart(2, "0");
+  minutes = String(minutes).padStart(2, "0");
+  seconds = String(seconds).padStart(2, "0");
+  milliseconds = String(milliseconds).padStart(3, "0");
+
+  let formattedTime = "";
+  if (hours > 0) formattedTime += `${hours}:`;
+  if (minutes > 0) formattedTime += `${minutes}:`;
+  formattedTime += `${seconds}.${milliseconds}`;
+
+  timerDiv.textContent = formattedTime;
+}
+
+function storeInputState(input) {
+  const key = `rememberInput-${input.id}`;
+  const get = () => (input.type === "checkbox" ? input.checked : input.value);
+  const set = (v) => {
+    if (input.type === "checkbox") input.checked = v === "true";
+    else input.value = v;
+  };
+
+  set(localStorage.getItem(key) || get());
+  input.addEventListener("input", () => localStorage.setItem(key, get()));
+}
+
+function toggleTimer() {
+  timerDiv.style.display = timerCheckbox.checked ? "flex" : "none";
+}
+
+function toggleQuickReveal() {
+  ms.quickReveal = quickRevealCheckbox.checked;
+}
+
 const ms = new Minesweeper(document.getElementById("grid"));
 
 const rowsInput = document.getElementById("rows");
 const colsInput = document.getElementById("cols");
 const minesInput = document.getElementById("mines");
 const startButton = document.getElementById("start");
+const timerDiv = document.getElementById("timer");
+const timerCheckbox = document.getElementById("timerToggle");
+const quickRevealCheckbox = document.getElementById("quickRevealToggle");
 
-function generateGrid() {
-  ms.initiateGrid(colsInput.value, rowsInput.value, minesInput.value / 100);
-}
-
-function limitNumberInput(input) {
-  input.value =
-    localStorage.getItem(`rememberInput-${input.id}`, input.value) ||
-    input.value;
-  input.addEventListener("input", () => {
-    input.value = Math.min(Math.max(input.value, input.min), input.max);
-    localStorage.setItem(`rememberInput-${input.id}`, input.value);
-  });
-}
+let timerLoop = setInterval(updateTimer, 10);
 
 limitNumberInput(rowsInput);
 limitNumberInput(colsInput);
 limitNumberInput(minesInput);
+storeInputState(timerCheckbox);
+storeInputState(quickRevealCheckbox);
+
+timerCheckbox.addEventListener("input", toggleTimer);
+toggleTimer();
+
+quickRevealCheckbox.addEventListener("input", toggleQuickReveal);
+toggleQuickReveal();
 
 startButton.onclick = generateGrid;
 generateGrid();

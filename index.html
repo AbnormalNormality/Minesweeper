@@ -33,8 +33,27 @@
       <input type="number" id="mines" min="1" max="99" step="7" value="15" />
       <button id="start">Generate</button>
     </div>
+
     <div id="grid">
       <div class="filter"></div>
+    </div>
+
+    <div id="timer"></div>
+
+    <div id="options">
+      <div>
+        <label for="timerToggle">Timer</label>
+        <input type="checkbox" id="timerToggle" />
+      </div>
+      <div>
+        <label
+          for="quickRevealToggle"
+          title="Let's you click on a revealed tile to quickly reveal the surrounding tiles.&#10;(Only works if you have marked the correct number of tiles around the tile)"
+        >
+          Quick reveal
+        </label>
+        <input type="checkbox" id="quickRevealToggle" checked />
+      </div>
     </div>
 
     <script src="src/scripts/main.js"></script>
