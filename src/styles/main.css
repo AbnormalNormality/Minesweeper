@@ -185,14 +185,20 @@ div {
   border: var(--border);
   border-radius: 5px;
   background-color: var(--colour);
-  transition: background-color var(--tile-transition) ease;
-  display: flex;
   justify-content: center;
   align-items: center;
+  display: flex;
+  transition: background-color var(--tile-transition) ease;
+}
+
+#inputToggleLabel.transition-blocked {
+  transition: none;
+  display: none;
 }
 
 #inputToggle {
   display: none;
+  user-select: none;
 }
 
 #inputToggleText {

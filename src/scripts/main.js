@@ -250,7 +250,8 @@ class Minesweeper {
       (markedRevealedMines === this.mines.length &&
         this.quickWin &&
         this.markedSafe == 0) ||
-      markedRevealedMines === this.totalTiles - this.revealedSafe - 1;
+      markedRevealedMines === this.totalTiles - this.revealedSafe - 1 ||
+      this.revealedSafe == this.totalTiles - this.mines.length;
     const lose = this.revealedMines > 0;
 
     if (win || lose) {
@@ -319,13 +320,17 @@ function storeInputState(input) {
   const key = `rememberInput-${input.id}`;
   const get = () => (input.type === "checkbox" ? input.checked : input.value);
   const set = (v) => {
-    if (input.type === "checkbox") input.checked = v;
-    else if (input.type === "number")
+    if (input.type === "checkbox") {
+      input.checked = v === true || v === "true"; // convert string to boolean
+    } else if (input.type === "number") {
       input.value = Math.min(Math.max(v, input.min), input.max);
-    else input.value = v;
+    } else {
+      input.value = v;
+    }
   };
 
-  set(localStorage.getItem(key) || get());
+  const saved = localStorage.getItem(key);
+  set(saved !== null ? saved : get());
   input.addEventListener("input", () => localStorage.setItem(key, get()));
 }
 
@@ -346,35 +351,52 @@ function toggleInput(checked) {
 
 const ms = new Minesweeper(document.getElementById("grid"));
 
-const rowsInput = document.getElementById("rows");
-const colsInput = document.getElementById("cols");
-const minesInput = document.getElementById("mines");
-const startButton = document.getElementById("start");
-const timerDiv = document.getElementById("timer");
-const timerCheckbox = document.getElementById("timerToggle");
-const quickRevealCheckbox = document.getElementById("quickRevealToggle");
-const quickWinCheckbox = document.getElementById("quickWinToggle");
-const inputToggleLabel = document.getElementById("inputToggleLabel");
-const inputToggleCheckbox = document.getElementById("inputToggle");
-const inputToggleDiv = document.getElementById("inputToggleText");
-
-let timerLoop = setInterval(updateTimer, 39);
-
-limitNumberInput(rowsInput);
-limitNumberInput(colsInput);
-limitNumberInput(minesInput);
-storeInputState(timerCheckbox);
-storeInputState(quickRevealCheckbox);
-storeInputState(quickWinCheckbox);
-
-bindInput(
+let rowsInput,
+  colsInput,
+  minesInput,
+  startButton,
+  timerDiv,
   timerCheckbox,
-  (checked) => (timerDiv.style.display = checked ? "flex" : "none")
-);
+  quickRevealCheckbox,
+  quickWinCheckbox,
+  inputToggleLabel,
+  inputToggleCheckbox,
+  inputToggleDiv,
+  timerLoop;
 
-bindInput(quickRevealCheckbox, (checked) => (ms.quickReveal = checked));
-bindInput(quickWinCheckbox, (checked) => (ms.quickWin = checked));
-bindInput(inputToggleCheckbox, toggleInput);
+document.addEventListener("DOMContentLoaded", () => {
+  rowsInput = document.getElementById("rows");
+  colsInput = document.getElementById("cols");
+  minesInput = document.getElementById("mines");
+  startButton = document.getElementById("start");
+  timerDiv = document.getElementById("timer");
+  timerCheckbox = document.getElementById("timerToggle");
+  quickRevealCheckbox = document.getElementById("quickRevealToggle");
+  quickWinCheckbox = document.getElementById("quickWinToggle");
+  inputToggleLabel = document.getElementById("inputToggleLabel");
+  inputToggleCheckbox = document.getElementById("inputToggle");
+  inputToggleDiv = document.getElementById("inputToggleText");
 
-startButton.onclick = generateGrid;
-generateGrid();
+  timerLoop = setInterval(updateTimer, 39);
+
+  limitNumberInput(rowsInput);
+  limitNumberInput(colsInput);
+  limitNumberInput(minesInput);
+  storeInputState(timerCheckbox);
+  storeInputState(quickRevealCheckbox);
+  storeInputState(quickWinCheckbox);
+  storeInputState(inputToggleCheckbox);
+  inputToggleLabel.classList.remove("transition-blocked");
+
+  bindInput(
+    timerCheckbox,
+    (checked) => (timerDiv.style.display = checked ? "flex" : "none")
+  );
+
+  bindInput(quickRevealCheckbox, (checked) => (ms.quickReveal = checked));
+  bindInput(quickWinCheckbox, (checked) => (ms.quickWin = checked));
+  bindInput(inputToggleCheckbox, toggleInput);
+
+  startButton.onclick = generateGrid;
+  generateGrid();
+});
