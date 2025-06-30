@@ -348,55 +348,39 @@ function toggleInput(checked) {
   );
   inputToggleDiv.textContent = checked ? "⚑" : "X";
 }
-
 const ms = new Minesweeper(document.getElementById("grid"));
 
-let rowsInput,
-  colsInput,
-  minesInput,
-  startButton,
-  timerDiv,
+const rowsInput = document.getElementById("rows");
+const colsInput = document.getElementById("cols");
+const minesInput = document.getElementById("mines");
+const startButton = document.getElementById("start");
+const timerDiv = document.getElementById("timer");
+const timerCheckbox = document.getElementById("timerToggle");
+const quickRevealCheckbox = document.getElementById("quickRevealToggle");
+const quickWinCheckbox = document.getElementById("quickWinToggle");
+const inputToggleLabel = document.getElementById("inputToggleLabel");
+const inputToggleCheckbox = document.getElementById("inputToggle");
+const inputToggleDiv = document.getElementById("inputToggleText");
+
+let timerLoop = setInterval(updateTimer, 39);
+
+limitNumberInput(rowsInput);
+limitNumberInput(colsInput);
+limitNumberInput(minesInput);
+storeInputState(timerCheckbox);
+storeInputState(quickRevealCheckbox);
+storeInputState(quickWinCheckbox);
+storeInputState(inputToggleCheckbox);
+inputToggleLabel.classList.remove("transition-blocked");
+
+bindInput(
   timerCheckbox,
-  quickRevealCheckbox,
-  quickWinCheckbox,
-  inputToggleLabel,
-  inputToggleCheckbox,
-  inputToggleDiv,
-  timerLoop;
+  (checked) => (timerDiv.style.display = checked ? "flex" : "none")
+);
 
-document.addEventListener("DOMContentLoaded", () => {
-  rowsInput = document.getElementById("rows");
-  colsInput = document.getElementById("cols");
-  minesInput = document.getElementById("mines");
-  startButton = document.getElementById("start");
-  timerDiv = document.getElementById("timer");
-  timerCheckbox = document.getElementById("timerToggle");
-  quickRevealCheckbox = document.getElementById("quickRevealToggle");
-  quickWinCheckbox = document.getElementById("quickWinToggle");
-  inputToggleLabel = document.getElementById("inputToggleLabel");
-  inputToggleCheckbox = document.getElementById("inputToggle");
-  inputToggleDiv = document.getElementById("inputToggleText");
+bindInput(quickRevealCheckbox, (checked) => (ms.quickReveal = checked));
+bindInput(quickWinCheckbox, (checked) => (ms.quickWin = checked));
+bindInput(inputToggleCheckbox, toggleInput);
 
-  timerLoop = setInterval(updateTimer, 39);
-
-  limitNumberInput(rowsInput);
-  limitNumberInput(colsInput);
-  limitNumberInput(minesInput);
-  storeInputState(timerCheckbox);
-  storeInputState(quickRevealCheckbox);
-  storeInputState(quickWinCheckbox);
-  storeInputState(inputToggleCheckbox);
-  inputToggleLabel.classList.remove("transition-blocked");
-
-  bindInput(
-    timerCheckbox,
-    (checked) => (timerDiv.style.display = checked ? "flex" : "none")
-  );
-
-  bindInput(quickRevealCheckbox, (checked) => (ms.quickReveal = checked));
-  bindInput(quickWinCheckbox, (checked) => (ms.quickWin = checked));
-  bindInput(inputToggleCheckbox, toggleInput);
-
-  startButton.onclick = generateGrid;
-  generateGrid();
-});
+startButton.onclick = generateGrid;
+generateGrid();
