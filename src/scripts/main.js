@@ -212,8 +212,7 @@ class Minesweeper {
       for (let c = 0; c < this.cols; c++) {
         const tile = this.grid[r][c];
         if (
-          r !== startingTile.row &&
-          c !== startingTile.col &&
+          !(r === startingTile.row && c === startingTile.col) &&
           !tile.mine &&
           !tile.revealed
         )
@@ -384,3 +383,4 @@ bindInput(inputToggleCheckbox, toggleInput);
 
 startButton.onclick = generateGrid;
 generateGrid();
+
